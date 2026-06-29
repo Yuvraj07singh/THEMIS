@@ -1,0 +1,159 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  name         String
+  jobTitle     String?
+  role         String // CA | LAWYER | INDIVIDUAL
+  firmId       String?
+  firm         Firm?    @relation(fields: [firmId], references: [id])
+  createdAt    DateTime @default(now())
+
+  auditLogs     AuditLog[]
+  generatedDocs GeneratedDoc[]
+  documents     Document[]
+  reviews       ContractReview[]
+}
+
+model Firm {
+  id        String   @id @default(cuid())
+  name      String
+  type      String // CA | LAW
+  createdAt DateTime @default(now())
+
+  users   User[]
+  clients Client[]
+}
+
+model Client {
+  id                String    @id @default(cuid())
+  firmId            String
+  firm              Firm      @relation(fields: [firmId], references: [id])
+  name              String
+  gstin             String?
+  pan               String?
+  entityType        String // PROPRIETORSHIP | PARTNERSHIP | LLP | PVT_LTD | PUBLIC_LTD
+  state             String?
+  gstRegDate        DateTime?
+  incorporationDate DateTime?
+  turnoverBand      String? // UNDER_1_5CR | CR_1_5_TO_5 | OVER_5CR
+  qrmpOpted         Boolean   @default(false)
+  hasTds            Boolean   @default(false)
+  hasPfEsi          Boolean   @default(false)
+  createdAt         DateTime  @default(now())
+
+  documents Document[]
+  notices   Notice[]
+  deadlines Deadline[]
+}
+
+model Document {
+  id        String   @id @default(cuid())
+  ownerId   String
+  owner     User     @relation(fields: [ownerId], references: [id])
+  clientId  String?
+  client    Client?  @relation(fields: [clientId], references: [id])
+  filename  String
+  path      String
+  mimeType  String
+  size      Int
+  kind      String // NOTICE | CONTRACT | REGISTRATION | GENERATED | OTHER
+  createdAt DateTime @default(now())
+
+  notices         Notice[]
+  contractReviews ContractReview[]
+}
+
+model Notice {
+  id           String    @id @default(cuid())
+  clientId     String
+  client       Client    @relation(fields: [clientId], references: [id])
+  documentId   String
+  document     Document  @relation(fields: [documentId], references: [id])
+  status       String    @default("UPLOADED") // UPLOADED | EXTRACTED | DRAFTED | APPROVED | EXPORTED | FAILED
+  noticeType   String? // DRC-01 | DRC-01A | ASMT-10 | GSTR-3A | OTHER
+  section      String?
+  period       String?
+  demandAmount Float?
+  dueDate      DateTime?
+  issuedBy     String?
+  summary      String? // extraction JSON
+  createdAt    DateTime  @default(now())
+
+  reply Reply?
+}
+
+model Reply {
+  id               String    @id @default(cuid())
+  noticeId         String    @unique
+  notice           Notice    @relation(fields: [noticeId], references: [id])
+  draftText        String
+  citationsJson    String // [{id, sectionRef, quote, verified}]
+  verificationJson String // {total, verified, failed, flags[]}
+  reviewedById     String?
+  reviewedAt       DateTime?
+  exportedAt       DateTime?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+}
+
+model Deadline {
+  id            String   @id @default(cuid())
+  clientId      String
+  client        Client   @relation(fields: [clientId], references: [id])
+  title         String
+  kind          String // GSTR1 | GSTR3B | GSTR9 | TDS_DEPOSIT | TDS_RETURN | ADVANCE_TAX | MCA_AOC4 | MCA_MGT7 | DIR3_KYC | PF_ESI
+  dueDate       DateTime
+  status        String   @default("UPCOMING") // UPCOMING | DONE | OVERDUE
+  penaltyPerDay Float?
+  description   String?
+  createdAt     DateTime @default(now())
+
+  @@unique([clientId, kind, dueDate])
+}
+
+model ContractReview {
+  id           String    @id @default(cuid())
+  userId       String
+  user         User      @relation(fields: [userId], references: [id])
+  documentId   String
+  document     Document  @relation(fields: [documentId], references: [id])
+  status       String    @default("UPLOADED") // UPLOADED | ANALYZED | APPROVED | FAILED
+  findingsJson String? // [{ruleId, rule, severity, clauseQuote, verified, recommendation}]
+  riskScore    Int?
+  approvedAt   DateTime?
+  createdAt    DateTime  @default(now())
+}
+
+model GeneratedDoc {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  docType     String // NDA | FOUNDER_AGREEMENT | EMPLOYMENT | PRIVACY_POLICY
+  title       String
+  answersJson String
+  contentText String
+  status      String   @default("DRAFT") // DRAFT | FINAL
+  createdAt   DateTime @default(now())
+}
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  userId     String?
+  user       User?    @relation(fields: [userId], references: [id])
+  action     String // LOGIN | SIGNUP | UPLOAD | EXTRACT | DRAFT | APPROVE | EXPORT | CREATE | UPDATE | DELETE | GENERATE
+  entityType String?
+  entityId   String?
+  metadata   String?
+  ip         String?
+  createdAt  DateTime @default(now())
+}

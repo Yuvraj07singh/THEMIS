@@ -1,0 +1,40 @@
+/* ==========================================================================
+   ScoreRing Styles
+   ========================================================================== */
+
+.score-ring {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.score-ring__svg {
+  transform: scaleX(1); /* Ensure proper rendering direction */
+}
+
+.score-ring__progress {
+  will-change: stroke-dashoffset;
+}
+
+.score-ring__label {
+  position: absolute;
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: var(--space-1);
+}
+
+.score-ring__number {
+  font-family: var(--font-display);
+  font-size: var(--text-5xl);
+  font-weight: 700;
+  line-height: 1;
+}
+
+.score-ring__unit {
+  font-family: var(--font-body);
+  font-size: var(--text-lg);
+  color: var(--text-muted);
+  font-weight: 500;
+}

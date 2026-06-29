@@ -1,0 +1,82 @@
+/* ==========================================================================
+   Button Styles
+   ========================================================================== */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  font-family: var(--font-body);
+  font-weight: 600;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  border-radius: var(--radius-full);
+  transition: background var(--duration-fast) var(--ease-out),
+              color var(--duration-fast) var(--ease-out),
+              transform var(--duration-fast) var(--ease-out),
+              box-shadow var(--duration-fast) var(--ease-out),
+              border-color var(--duration-fast) var(--ease-out);
+  white-space: nowrap;
+}
+
+.btn:active {
+  transform: scale(0.97);
+}
+
+/* ---- Sizes ---- */
+
+.btn--sm {
+  padding: var(--space-2) var(--space-4);
+  font-size: var(--text-sm);
+}
+
+.btn--md {
+  padding: var(--space-3) var(--space-6);
+  font-size: var(--text-base);
+}
+
+.btn--lg {
+  padding: var(--space-4) var(--space-8);
+  font-size: var(--text-lg);
+}
+
+/* ---- Variants ---- */
+
+/* Primary: Gold fill, dark text */
+.btn--primary {
+  background: var(--gold-primary);
+  color: var(--bg-void);
+}
+
+.btn--primary:hover {
+  background: var(--gold-light);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-gold);
+}
+
+/* Secondary: Turquoise outline */
+.btn--secondary {
+  background: transparent;
+  color: var(--turquoise-primary);
+  border: 1px solid var(--border-turquoise-strong);
+}
+
+.btn--secondary:hover {
+  background: var(--turquoise-glow);
+  border-color: var(--turquoise-primary);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-turquoise);
+}
+
+/* Ghost: Text only */
+.btn--ghost {
+  background: transparent;
+  color: var(--text-secondary);
+}
+
+.btn--ghost:hover {
+  color: var(--turquoise-primary);
+  background: var(--turquoise-glow);
+}
