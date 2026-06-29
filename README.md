@@ -81,7 +81,7 @@ THEMIS/
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/your-username/THEMIS.git
+git clone https://github.com/Yuvraj07singh/THEMIS.git
 cd THEMIS
 ```
 
